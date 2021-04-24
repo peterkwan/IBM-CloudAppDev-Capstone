@@ -3,7 +3,9 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404, render, redirect
 # from .models import related models
+from .models import CarDealer, DealerReview
 # from .restapis import related methods
+from .restapis import get_dealers_from_cf, get_dealer_reviews_from_cf
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
 from datetime import datetime
@@ -76,15 +78,28 @@ def registration_request(request):
 # Update the `get_dealerships` view to render the index page with a list of dealerships
 def get_dealerships(request):
     context = {}
-    if request.method == "GET":
-        return render(request, 'djangoapp/index.html', context)
+    if request.method == 'GET':
+        url = 'https://6133d11d.us-south.apigw.appdomain.cloud/api/dealership'
+        dealerships = get_dealers_from_cf(url, **(request.GET))
+        dealer_names = '<br/>'.join([dealer.short_name for dealer in dealerships])
+        return HttpResponse(dealer_names)
+#        return render(request, 'djangoapp/index.html', context)
 
 
 # Create a `get_dealer_details` view to render the reviews of a dealer
 # def get_dealer_details(request, dealer_id):
 # ...
+def get_dealer_details(request, dealer_id):
+    context = {}
+    if request.method == 'GET':
+        url = 'https://6133d11d.us-south.apigw.appdomain.cloud/api/review'
+        dealer_reviews = get_dealer_reviews_from_cf(url, dealer_id)
+        dealer_review_names = '<br/>'.join([review.name + ' - Review: ' + review.sentiment for review in dealer_reviews])
+        return HttpResponse(dealer_review_names)
 
 # Create a `add_review` view to submit a review
 # def add_review(request, dealer_id):
 # ...
+def add_review(request, review):
+    pass
 
