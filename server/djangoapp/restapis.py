@@ -3,6 +3,8 @@ import json
 # import related models here
 from .models import CarDealer, DealerReview
 from requests.auth import HTTPBasicAuth
+from dotenv import load_dotenv
+import os
 
 
 # Create a `get_request` to make HTTP GET requests
@@ -10,15 +12,27 @@ from requests.auth import HTTPBasicAuth
 #                                     auth=HTTPBasicAuth('apikey', api_key))
 def get_request(url, **kwargs):
     try:
-        if api_key:
-            response = requests.get(url, headers={'Content-Type':'application/json'}, params=kwargs, auth=HTTPBasicAuth('apikey', api_key))
+        api_key = None
+        if 'api_key' in kwargs:
+            params = {
+                'text': kwargs['text'],
+                'version': '2021-03-25',
+                'features': 'sentiment',
+                'return_analyzed_text': True
+            }
+            api_key = kwargs['api_key']
+            response = requests.get(url, headers={'Content-Type':'application/json'}, params=params, auth=HTTPBasicAuth('apikey', api_key))
         else:
-            response = request.get(url, headers={'Content-Type':'application/json'}, params=kwargs)
+            response = requests.get(url, headers={'Content-Type':'application/json'}, params=kwargs)
         status_code = response.status_code
-        json_data = json.loads(response.text)
-        return json_data
-    except:
-        print('Error occurred')
+        if status_code == 200:
+            json_data = json.loads(response.text)
+            return json_data
+        else:
+            print('Response Status Code = ', status_code)
+            return None
+    except Exception as e:
+        print('Error occurred', e)
         return None
 
 # Create a `post_request` to make HTTP POST requests
@@ -55,11 +69,11 @@ def get_dealer_reviews_from_cf(url, dealer_id):
 # - Call get_request() with specified arguments
 # - Get the returned sentiment label such as Positive or Negative
 def analyze_review_sentiments(text):
-    params = {
-        'text': kwargs['text'],
-        'version': kwargs['version'],
-        'features': kwargs['features'],
-        'returned_analyzed_text' = kwargs['returned_analyzed_text']
+    load_dotenv(os.path.join(os.path.dirname(__file__), '..', '.env'))
+    kwargs = {
+        'text': text,
+        'api_key': os.getenv('API_KEY')
     }
-    result = get_request(url, **params)
-    return result
+    url = os.getenv('API_URL')
+    result = get_request(url + '/v1/analyze', **kwargs)
+    return result['sentiment']['document']['label']
