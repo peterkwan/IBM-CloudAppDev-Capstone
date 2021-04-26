@@ -11,6 +11,50 @@
 
 </head>
     <body>
-    <!--Add review form here -->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <a class="navbar-brand" href="{% url 'djangoapp:index' %}">Dealer Review</a>
+                </div>
+                <button class="navbar-toggler" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="nav navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'djangoapp:about' %}">About Us</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'djangoapp:contact' %}">Contact Us</a>
+                        </li>
+                    </ul>
+                </div>                
+            </div>
+        </nav>
+
+        <!--Add review form here -->
+        <div class="container-fluid m-3">
+            <h2>Add a review about {{dealer.full_name}}</h2>
+            <form class="form" action="{% url 'djangoapp:add_review' dealer.id %}" method="post">
+                <div class="form-group col-8">
+                    <label for="content">Enter the review content:</label>
+                    <textarea class="form-control" id="content" name="content" rows="2" required></textarea>
+                </div>
+                <div class="form-group col-8 m-3">
+                    <input type="checkbox" class="form-check-input" name="purchase_check" id="purchase_check"> Has purchased the car from {{dealer.full_name}}? (select purchased car information below if checked)
+                </div>
+                <div class="form-group col-4">
+                    <label for="car">Select your car (model-make-year):</label>
+                    <select id="car" name="car" class="form-select" required>
+
+                    </select>
+                </div>
+                <div class="form-group col-2">
+                    <label for="purchase_date">Select Your Purchase Date:</label>
+                    <input class="date-own form-control" type="text" name="purchase_date" id="purchase_date">
+                </div>
+                <button class="btn btn-primary m-3" type="submit">Submit</button>
+            </form>
+        </div>
     </body>
 </html>
