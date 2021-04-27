@@ -36,6 +36,7 @@
         <div class="container-fluid m-3">
             <h2>Add a review about {{dealer.full_name}}</h2>
             <form class="form" action="{% url 'djangoapp:add_review' dealer.id %}" method="post">
+                {% csrf_token %}
                 <div class="form-group col-8">
                     <label for="content">Enter the review content:</label>
                     <textarea class="form-control" id="content" name="content" rows="2" required></textarea>

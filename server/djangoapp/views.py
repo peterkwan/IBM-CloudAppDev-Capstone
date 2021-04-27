@@ -5,7 +5,7 @@ from django.shortcuts import get_object_or_404, render, redirect
 # from .models import related models
 from .models import CarDealer, DealerReview, CarMake, CarModel
 # from .restapis import related methods
-from .restapis import get_dealers_from_cf, get_dealer_reviews_from_cf
+from .restapis import get_dealers_from_cf, get_dealer_reviews_from_cf, add_review_to_cf
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
 from datetime import datetime
@@ -111,4 +111,37 @@ def add_review(request, dealer_id):
         context['cars'] = CarModel.objects.filter(dealer_id=dealer_id)
         return render(request, 'djangoapp/add_review.html', context)
     elif request.method == 'POST':
-        pass
+        url = 'https://6133d11d.us-south.apigw.appdomain.cloud/api/review'
+        dealer_reviews = get_dealer_reviews_from_cf(url, dealer_id)
+
+        if 'purchase_check' in request.POST:
+            car = CarModel.objects.get(id=request.POST['car'])
+            car_make = car.make.name
+            car_model = car.name
+            car_year = car.year.strftime('%Y')
+            json_payload = {
+                'review': {
+                    'id': new_id,
+                    'review': request.POST['content'],
+                    'purchase': True,
+                    'purchase_date': request.POST['purchase_date'],
+                    'dealership': dealer_id,
+                    'car_make': car_make,
+                    'car_model': car_model,
+                    'car_year': car_year,
+                    'review_time': datetime.utcnow().isoformat()
+                }
+            }
+        else:
+            json_payload = {
+                'review': {
+                    'id': new_id,
+                    'review': request.POST['content'],
+                    'purchase': False,
+                    'dealership': dealer_id,
+                    'review_time': datetime.utcnow().isoformat()
+                }
+            }
+
+        # add_review_to_cf(url, json_payload)
+        return redirect('djangoapp:dealer_details', dealer_id=dealer_id)

@@ -90,3 +90,6 @@ def analyze_review_sentiments(text):
     url = os.getenv('API_URL')
     result = get_request(url + '/v1/analyze', **kwargs)
     return result['sentiment']['document']['label']
+
+def add_review_to_cf(url, json_payload):
+    return post_request(url, json_payload)
