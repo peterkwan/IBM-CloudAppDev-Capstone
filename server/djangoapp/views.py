@@ -113,6 +113,8 @@ def add_review(request, dealer_id):
     elif request.method == 'POST':
         url = 'https://6133d11d.us-south.apigw.appdomain.cloud/api/review'
         dealer_reviews = get_dealer_reviews_from_cf(url, dealer_id)
+        max_id = max([review.id for review in dealer_reviews], default=100)
+        new_id = max_id + 1 if max_id >= 100 else max_id + 100
 
         if 'purchase_check' in request.POST:
             car = CarModel.objects.get(id=request.POST['car'])
@@ -122,6 +124,7 @@ def add_review(request, dealer_id):
             json_payload = {
                 'review': {
                     'id': new_id,
+                    'name': request.user.get_full_name(),
                     'review': request.POST['content'],
                     'purchase': True,
                     'purchase_date': request.POST['purchase_date'],
@@ -136,6 +139,7 @@ def add_review(request, dealer_id):
             json_payload = {
                 'review': {
                     'id': new_id,
+                    'name': request.user.get_full_name(),
                     'review': request.POST['content'],
                     'purchase': False,
                     'dealership': dealer_id,
@@ -143,5 +147,5 @@ def add_review(request, dealer_id):
                 }
             }
 
-        # add_review_to_cf(url, json_payload)
+        add_review_to_cf(url, json_payload)
         return redirect('djangoapp:dealer_details', dealer_id=dealer_id)

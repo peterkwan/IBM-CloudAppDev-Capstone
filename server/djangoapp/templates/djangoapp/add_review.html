@@ -46,7 +46,7 @@
                 </div>
                 <div id="car_select" class="form-group col-4">
                     <label for="car">Select your car (model-make-year):</label>
-                    <select id="car" name="car" class="form-select" required>
+                    <select id="car" name="car" class="form-select">
                         {% for car in cars %}
                         <option selected value="{{car.id}}">{{car.name}}-{{car.make.name}}-{{car.year|date:"Y"}}</option>
                         {% endfor %}
@@ -67,6 +67,7 @@
             });
 
             $('#purchase_check').change(function() {
+                $('#car').prop('required', this.checked)
                 $('#car_select').toggle(this.checked);
                 $('#car_purchase_date').toggle(this.checked);
             });
