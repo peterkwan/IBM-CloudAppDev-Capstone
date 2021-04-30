@@ -3,7 +3,6 @@ import json
 # import related models here
 from .models import CarDealer, DealerReview
 from requests.auth import HTTPBasicAuth
-from dotenv import load_dotenv
 import os
 
 
@@ -82,7 +81,6 @@ def get_dealer_reviews_from_cf(url, dealer_id):
 # - Call get_request() with specified arguments
 # - Get the returned sentiment label such as Positive or Negative
 def analyze_review_sentiments(text):
-    load_dotenv(os.path.join(os.path.dirname(__file__), '..', '.env'))
     kwargs = {
         'text': text,
         'api_key': os.getenv('API_KEY')
